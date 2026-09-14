@@ -1,0 +1,50 @@
+TASK: Add Terms of Conditions and Privacy Policy pages to the Spendly expense tracker (Flask app).
+
+CONTEXT (read these first before writing any code):
+- This is a Flask app (app.py) using render_template with Jinja2 templates in templates/, all extending templates/base.html.
+- Existing simple routes follow this pattern exactly (see app.py):
+    @app.route("/login")
+    def login():
+        return render_template("login.html")
+  Follow this same style — no blueprints, no extra abstraction.
+- Existing page templates (e.g. templates/landing.html) follow this structure:
+    {% extends "base.html" %}
+    {% block title %}...{% endblock %}
+    {% block content %}...{% endblock %}
+- templates/base.html contains the shared navbar and footer. The footer currently only shows the brand icon, brand name, and a tagline — it has no links yet.
+- Styling is a single stylesheet at static/css/style.css. There is no per-page CSS.
+- The app is called "Spendly" — a personal expense tracking app.
+- No tests currently exist in the project, but pytest and pytest-flask are already listed in requirements.txt (not yet used anywhere).
+
+WHAT TO BUILD:
+
+1. Two new routes in app.py, placed alongside the other simple GET routes (near /login and /register), following the exact same style:
+   - GET /terms → renders templates/terms.html
+   - GET /privacy → renders templates/privacy.html
+
+2. Two new templates, each extending base.html and using the {% block title %} / {% block content %} pattern exactly like landing.html:
+   - templates/terms.html — "Terms of Conditions" page
+   - templates/privacy.html — "Privacy Policy" page
+   Content requirements:
+   - Generic, clearly placeholder legal content appropriate for a personal expense-tracking app (mentions things like: account registration data, expense entries a user logs, no selling of data to third parties, right to delete account/data, contact for questions, "last updated" date placeholder). Do NOT present this as real legal advice — it's boilerplate/sample content for a learning project, written in plain readable prose broken into a few labeled sections (e.g. headings like "Information We Collect", "How We Use It", "Your Rights", "Changes to This Policy").
+   - Reuse existing typographic/section conventions from the CSS (check style.css for existing heading, paragraph, and section classes before inventing new ones) so the pages look consistent with the rest of the site rather than unstyled.
+
+3. Update templates/base.html footer ONLY to add two links — "Terms" and "Privacy" — pointing to url_for('terms') and url_for('privacy'), placed inside the existing <footer class="footer"> / <div class="footer-inner"> structure. Reuse an existing link/nav CSS class if one is suitable; only add new minimal CSS to static/css/style.css if nothing existing fits, and keep any such addition small and additive (do not restructure existing footer CSS rules).
+
+SCOPE / GUARDRAILS (important):
+- Only touch: app.py, templates/base.html (footer section only), static/css/style.css (only if a new minimal footer-link style is genuinely needed), and the two new template files.
+- Do NOT modify templates/login.html, templates/register.html, templates/landing.html, static/js/main.js, database/, or any other existing route/file.
+- Do NOT refactor, rename, or restructure any existing code, routes, or CSS while doing this.
+- Do NOT add new dependencies — flask/werkzeug/pytest/pytest-flask already cover everything needed.
+- The change must be fully regression-free: every existing route, page, and link must continue to work and render exactly as before.
+
+TESTING (do this last):
+No test suite exists yet, so first create tests/conftest.py with a standard pytest-flask `app` fixture (returning the Flask app instance from app.py), which will make the `client` fixture available automatically. Then create tests/test_terms_privacy.py covering:
+- GET /terms returns HTTP 200
+- GET /terms response contains the text "Terms" (or the page's actual heading text)
+- GET /privacy returns HTTP 200
+- GET /privacy response contains the text "Privacy" (or the page's actual heading text)
+- The rendered landing page (GET /) HTML contains href="/terms" and href="/privacy" (footer links present) — this is a regression check on base.html
+- GET / (landing), GET /login, and GET /register still all return HTTP 200 (regression check that unrelated existing routes were not broken)
+
+After writing the tests, run them (pytest) and report the results. Do not leave failing tests uncommented — fix the implementation, not the test, unless the test itself is wrong.
