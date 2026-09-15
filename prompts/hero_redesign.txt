@@ -1,0 +1,94 @@
+TASK: Update the visual design of the hero section on the landing page (templates/landing.html) 
+to match the attached reference image. Scope is strictly limited to the hero section — nothing 
+else in the app should change.
+
+REFERENCE IMAGE: [attached] — use this as the visual source of truth for the hero section's 
+layout, spacing, typography treatment, colors, and any visual elements (badge, illustration/card, 
+button styling, etc.). Where the image is ambiguous or leaves something to interpretation (exact 
+colors, font weights, spacing values not clearly inferable), stay consistent with this project's 
+existing design tokens (CSS custom properties in static/css/style.css — e.g. --accent, --ink, 
+--ink-muted, --paper-card, --border, --radius-lg, --font-display) rather than inventing new ones, 
+unless the image clearly calls for a new token — in that case, add it near the other custom 
+properties and flag it in your summary.
+
+CURRENT STATE (read this before making changes):
+- The hero section lives in templates/landing.html, inside {% block content %}, wrapped in 
+  <section class="hero">. It currently contains: a .hero-inner wrapper with a .hero-badge, 
+  .hero-title (with an <em> for emphasis), .hero-subtitle, and .hero-actions (two buttons: 
+  .btn-primary and .btn-ghost) — plus a .hero-visual containing a .mock-card that shows a fake 
+  spending breakdown (category bars).
+- Hero-related CSS is in static/css/style.css:
+    - .hero, .hero-badge, .hero-title, .hero-title em, .hero-subtitle, .hero-actions 
+      (roughly lines 126–177)
+    - .hero-visual, .mock-card, .mock-card-header, .mock-label, .mock-total, .mock-bars, 
+      .mock-bar-row, .mock-cat, .mock-bar-track, .mock-bar, .mock-bar-2/3/4, .mock-amt 
+      (roughly lines 181–252) — this is the "mock card" visual on the right side of the hero
+    - Responsive overrides for the hero live under `@media (max-width: 900px)` and 
+      `@media (max-width: 600px)` near the bottom of the file (around lines 579–597)
+  Treat these as the current shape of the section — confirm exact line numbers yourself by 
+  reading the file first, since they may drift slightly.
+- Design tokens (colors, fonts, spacing scale, radii) are defined as CSS custom properties near 
+  the top of static/css/style.css — reuse these wherever the image's design maps onto an 
+  existing token.
+- The stack is Flask + Jinja2 templates with one shared static/css/style.css (no CSS modules, 
+  no per-page stylesheets, no build step/bundler — plain CSS).
+
+WHAT TO DO:
+1. Compare the attached image against the current hero section (markup structure, CSS) and 
+   identify concretely what's different: layout (e.g. columns vs. stacked, alignment), 
+   typography (heading size/weight/treatment), color usage, spacing/padding, the visual 
+   element on the right (is it still a card-style mock, an illustration, a different kind of 
+   graphic, or removed entirely?), button styling, and the badge.
+2. Update the HTML structure inside <section class="hero">...</section> in templates/landing.html 
+   only as needed to support the new design — keep existing class names where the element's 
+   role is unchanged (e.g. keep .hero-title on the heading) so you aren't forced to rewrite 
+   unrelated CSS, and introduce new classes only for genuinely new elements.
+3. Update ONLY the hero-related CSS rules listed above in static/css/style.css to match the 
+   image. Do not touch any CSS rules outside the hero/mock-card/hero-responsive blocks 
+   (navbar, footer, features section, CTA section, forms, buttons used elsewhere, etc.) — if a 
+   button or badge style is shared with other sections (check for .btn-primary/.btn-ghost usage 
+   elsewhere in the templates before changing them), either scope your change to a 
+   hero-specific class or confirm the shared style change is actually intended by the image 
+   before touching shared rules.
+4. Preserve the two existing responsive breakpoints' intent (stacked/centered layout under 
+   900px, tighter padding under 600px) — adjust their specific values if the new design 
+   requires it, but the hero must still degrade gracefully on mobile widths (~400px) after 
+   your change.
+5. Do not change the copy/text content of the hero (badge text, heading, subtitle, button 
+   labels) unless the image explicitly shows different text — if it does, use exactly what's 
+   shown in the image.
+
+SCOPE / GUARDRAILS (important):
+- Only touch: templates/landing.html (hero section markup only) and static/css/style.css 
+  (hero/mock-card/hero-responsive rules only).
+- Do NOT modify templates/base.html, templates/login.html, templates/register.html, app.py, 
+  static/js/main.js, or any other route, template, or file.
+- Do NOT touch non-hero sections of landing.html (.features, .cta-section) or their CSS.
+- Do NOT introduce a CSS framework, build step, or new dependency to achieve the design — 
+  plain CSS only, consistent with the rest of the file.
+- Do NOT refactor or reformat CSS/HTML outside the hero for style/consistency reasons, even if 
+  you notice something you'd improve — leave it untouched.
+- The change must be fully regression-free: every other page, route, and section must render 
+  and behave exactly as before.
+
+VERIFICATION / TEST CASES (do this last):
+Since this is a visual/CSS change, "tests" here should combine automated checks with a visual 
+check:
+1. Automated (pytest, using the existing pytest-flask setup — create tests/conftest.py with a 
+   standard `app` fixture if one doesn't already exist):
+   - GET / still returns HTTP 200
+   - The rendered HTML for GET / still contains a <section class="hero"> (or whatever the 
+     updated root hero class is) so the section wasn't accidentally removed
+   - The rendered HTML for GET / still contains the hero's call-to-action link(s) pointing to 
+     /register and /login (regression check — signup/login entry points must survive the 
+     redesign)
+   - GET /login and GET /register still return HTTP 200 (confirms nothing outside landing.html 
+     broke)
+2. Visual: run the Flask app locally, take a screenshot (or describe) the hero section at 
+   desktop width (~1440px), tablet width (~900px), and mobile width (~400px), and compare 
+   against the reference image at desktop width — call out any deviations and explain why 
+   (e.g. intentional token reuse vs. a gap you couldn't resolve without more image detail).
+
+Report back: (a) a summary of what changed and why, (b) the diff limited to the two allowed 
+files, (c) test results, (d) any part of the reference image you couldn't fully replicate with 
+plain CSS and what you approximated instead.
